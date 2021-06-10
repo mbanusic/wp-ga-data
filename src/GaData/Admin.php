@@ -27,4 +27,6 @@ class Admin extends Instance {
             echo intval(get_post_meta($post_ID, '_neznam_ga_pageviews', true));
         }
     }
+
+
 }

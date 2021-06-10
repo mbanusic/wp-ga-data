@@ -65,7 +65,7 @@ class Cli extends \WP_CLI_Command {
                         $posts->the_post();
                         $home = home_url();
                         // special case for this client, TODO: move to options
-                        $link = str_replace($home, '/', get_permalink($posts->post)) . 'index.php';
+                        $link = str_replace($home, '', get_permalink($posts->post)) . 'index.php';
                         $out[] = [
                             'id' => $posts->post->ID,
                             'link' => $link,
@@ -128,13 +128,13 @@ class Cli extends \WP_CLI_Command {
             $request->setDimensions([$dimensions]);
             $requests[] = $request;
         }
-
         $body = new \Google_Service_AnalyticsReporting_GetReportsRequest();
         $body->setReportRequests($requests);
         $reports = $this->analytics->reports->batchGet($body);
         for ( $reportIndex = 0; $reportIndex < count( $reports ); $reportIndex++ ) {
             $report = $reports[$reportIndex];
             $rows = $report->getData()->getRows();
+            if ($rows) {
                 $row = $rows[0];
                 if ($row) {
                     $dimensions = $row->getDimensions();
@@ -149,7 +149,38 @@ class Cli extends \WP_CLI_Command {
                         }
                     }
                 }
+            }
         }
 
+    }
+
+    public function dohvati_top_zginfo($args, $assoc_args)
+    {
+
+        //produkcija
+        $url = "https://zagreb.info/get_json_top_tema";
+
+        $json = file_get_contents($url);
+        update_option('zagreb_info', $json);
+
+        //$write_status = file_put_contents(__DIR__ . '/json/zginfo.json', json_encode($json), FILE_TEXT);
+    }
+
+    public function get_alias_details($args, $assoc_args) {
+        //$alias = $assoc_args['alias'];
+        global $wpdb;
+        $posts = $wpdb->get_results("SELECT * FROM wp_posts LEFT JOIN wp_postmeta ON wp_posts.ID = wp_postmeta.post_id WHERE wp_posts.post_status = 'publish' AND wp_postmeta.meta_key = 'alias' AND wp_postmeta.meta_value = 'Ivan Crnjac'");
+        foreach ($posts as $post) {
+            echo $post->ID . ';' . $post->post_title . ';' . get_post_meta($post->ID, '_neznam_ga_pageviews', true). "\n";
+        }
+    }
+
+    public function get_ads() {
+        $o = get_field_objects('dnevnohr_ads');
+        echo '<?php
+function nocno_ads_return()
+{
+    return ' . var_export($o, true) . '; }';
+        //var_dump( get_post_types( array( 'public' => true ) ) );
     }
 }

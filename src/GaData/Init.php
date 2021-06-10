@@ -43,6 +43,7 @@ class Init {
 
     public function init_hooks() {
         Admin::instance();
+        Elastic::instance();
         if (defined( 'WP_CLI' ) && WP_CLI) {
             Cli::instance();
         }
