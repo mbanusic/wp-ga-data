@@ -39,7 +39,7 @@ class Statistic extends Instance {
             <?php
             if (isset($_POST['od']) && $_POST['od']) {
             $authors = new \WP_User_Query([
-                'role' => 'editor',
+                'role__in' => ['editor', 'author'],
                 'number' => -1,
                 'fields' => 'all'
             ]);

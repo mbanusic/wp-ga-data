@@ -162,7 +162,6 @@ class Cli extends \WP_CLI_Command {
 
         $json = file_get_contents($url);
         update_option('zagreb_info', $json);
-
         //$write_status = file_put_contents(__DIR__ . '/json/zginfo.json', json_encode($json), FILE_TEXT);
     }
 
@@ -182,5 +181,18 @@ function nocno_ads_return()
 {
     return ' . var_export($o, true) . '; }';
         //var_dump( get_post_types( array( 'public' => true ) ) );
+    }
+
+    public function test() {
+        $q = new \WP_Query([
+            'post_type' => 'attachment',
+            'posts_per_page' => 100,
+            's' => 'Magzan'
+        ]);
+
+        while ($q->have_posts()) {
+            $q->the_post();
+            \WP_CLI::line($q->post->ID);
+        }
     }
 }
